@@ -1,4 +1,4 @@
-export default function Header({ searchQuery, setSearchQuery }) {
+export default function Header({ searchQuery, setSearchQuery, user, onOpenLogin, onLogout }) {
   return (
     <header className="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-8 z-20 shrink-0 shadow-sm">
       <div className="flex items-center space-x-4">
@@ -29,9 +29,26 @@ export default function Header({ searchQuery, setSearchQuery }) {
       </div>
 
       <div className="flex items-center space-x-3">
-        <span className="text-sm bg-amber-50 text-amber-800 border border-amber-200 px-4 py-2 rounded-xl font-medium">
-          🔒 Bearer Token + IP Whitelist
-        </span>
+        {user ? (
+          <div className="flex items-center space-x-3">
+            <span className="text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 px-3 py-2 rounded-xl">
+              👤 {user.name}
+            </span>
+            <button
+              onClick={onLogout}
+              className="text-xs bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 px-3.5 py-2 rounded-xl font-semibold transition"
+            >
+              Logout
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={onOpenLogin}
+            className="text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl font-semibold transition shadow-sm"
+          >
+            🔑 Login untuk Test API
+          </button>
+        )}
       </div>
     </header>
   );

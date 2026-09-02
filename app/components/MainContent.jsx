@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-export default function MainContent({ endpoint }) {
+export default function MainContent({ endpoint, user, onOpenLogin }) {
   const [tanggalAwal, setTanggalAwal] = useState('');
   const [tanggalAkhir, setTanggalAkhir] = useState('');
   const [apiKey, setApiKey] = useState('');
@@ -8,10 +8,11 @@ export default function MainContent({ endpoint }) {
   const [apiResult, setApiResult] = useState(null);
 
   const handleRealApiTest = async () => {
+    if (!user) return;
+
     setLoading(true);
     setApiResult(null);
 
-    // Memakai Base URL Resmi RSUD Manambai
     let url = `https://api-rsmanambai.ntbprov.go.id${endpoint.path}`;
     const queryParams = new URLSearchParams();
     
@@ -98,51 +99,70 @@ export default function MainContent({ endpoint }) {
         </div>
       </div>
 
-      {/* Form Input Parameter & Testing Console */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm">
+      {/* Console Pengujian TERPROTEKSI */}
+      <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm relative overflow-hidden">
         <h4 className="text-sm font-bold text-slate-900 uppercase">⚡ Console Pengujian API Real-Time</h4>
-        <div className="grid grid-cols-3 gap-4">
-          <div>
-            <label className="block text-xs font-semibold text-slate-600 mb-1">API Key / Bearer Token</label>
-            <input
-              type="password"
-              placeholder="Masukkan Token Rahasia..."
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 font-mono"
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-slate-600 mb-1">Tanggal Awal</label>
-            <input
-              type="date"
-              value={tanggalAwal}
-              onChange={(e) => setTanggalAwal(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500"
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-slate-600 mb-1">Tanggal Akhir</label>
-            <input
-              type="date"
-              value={tanggalAkhir}
-              onChange={(e) => setTanggalAkhir(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500"
-            />
-          </div>
-        </div>
+        
+        {user ? (
+          <>
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 mb-1">API Key / Bearer Token</label>
+                <input
+                  type="password"
+                  placeholder="Masukkan Token Rahasia..."
+                  value={apiKey}
+                  onChange={(e) => setApiKey(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 font-mono"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 mb-1">Tanggal Awal</label>
+                <input
+                  type="date"
+                  value={tanggalAwal}
+                  onChange={(e) => setTanggalAwal(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 mb-1">Tanggal Akhir</label>
+                <input
+                  type="date"
+                  value={tanggalAkhir}
+                  onChange={(e) => setTanggalAkhir(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500"
+                />
+              </div>
+            </div>
 
-        <button
-          onClick={handleRealApiTest}
-          disabled={loading}
-          className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition disabled:opacity-50 shadow-sm w-full"
-        >
-          {loading ? 'Menghubungi Server RSUD Manambai...' : 'Kirim Request ke https://api-rsmanambai.ntbprov.go.id'}
-        </button>
+            <button
+              onClick={handleRealApiTest}
+              disabled={loading}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition disabled:opacity-50 shadow-sm w-full"
+            >
+              {loading ? 'Menghubungi Server RSUD Manambai...' : 'Kirim Request ke https://api-rsmanambai.ntbprov.go.id'}
+            </button>
+          </>
+        ) : (
+          <div className="bg-slate-50 border border-dashed border-slate-300 rounded-xl p-8 text-center space-y-3">
+            <div className="text-2xl">🔒</div>
+            <h5 className="font-bold text-slate-800 text-sm">Fitur Kirim Request Dibatasi</h5>
+            <p className="text-xs text-slate-500 max-w-md mx-auto">
+              Anda perlu masuk terlebih dahulu untuk menggunakan konsol pengujian interaktif dan mengirim *request* ke server.
+            </p>
+            <button
+              onClick={onOpenLogin}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs px-4 py-2 rounded-xl transition shadow-sm"
+            >
+              Login Sekarang
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Output Respon Real */}
-      {apiResult && (
+      {user && apiResult && (
         <div className="bg-slate-900 text-slate-100 p-6 rounded-2xl border border-slate-800 space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider">Hasil Response Server Real-time:</span>

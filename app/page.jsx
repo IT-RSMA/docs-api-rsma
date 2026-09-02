@@ -6,12 +6,13 @@ import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import MainContent from './components/MainContent';
 import CodePanel from './components/CodePanel';
+import LoginModal from './components/LoginModal';
 
 export default function Home() {
   const [selectedEndpointId, setSelectedEndpointId] = useState('analytics-top-diseases');
   const [searchQuery, setSearchQuery] = useState('');
-  const [isSimulating, setIsSimulating] = useState(false);
-  const [customResponse, setCustomResponse] = useState(null);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [user, setUser] = useState(null);
 
   const activeEndpoint = useMemo(() => {
     for (const cat of API_DATA) {
@@ -33,34 +34,35 @@ export default function Home() {
     })).filter((cat) => cat.endpoints.length > 0);
   }, [searchQuery]);
 
-  const handleSimulateRequest = () => {
-    setIsSimulating(true);
-    setCustomResponse(null);
-    setTimeout(() => {
-      setIsSimulating(false);
-      setCustomResponse(Object.values(activeEndpoint.responses)[0]);
-    }, 500);
-  };
-
   return (
     <div className="flex flex-col h-screen bg-slate-50 font-sans overflow-hidden">
-      <Header searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+      <Header
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        user={user}
+        onOpenLogin={() => setIsLoginModalOpen(true)}
+        onLogout={() => setUser(null)}
+      />
+      
       <div className="flex flex-1 overflow-hidden">
         <Sidebar
           data={filteredData}
           selectedId={selectedEndpointId}
-          onSelect={(id) => {
-            setSelectedEndpointId(id);
-            setCustomResponse(null);
-          }}
+          onSelect={(id) => setSelectedEndpointId(id)}
         />
         <MainContent
           endpoint={activeEndpoint}
-          onSimulate={handleSimulateRequest}
-          isSimulating={isSimulating}
+          user={user}
+          onOpenLogin={() => setIsLoginModalOpen(true)}
         />
-        <CodePanel endpoint={activeEndpoint} customResponse={customResponse} />
+        <CodePanel endpoint={activeEndpoint} />
       </div>
+
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        onLoginSuccess={(userData) => setUser(userData)}
+      />
     </div>
   );
 }
