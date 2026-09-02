@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-export default function MainContent({ endpoint, user, onOpenLogin }) {
+export default function MainContent({ endpoint, user, onOpenLogin, isDarkMode }) {
   const [tanggalAwal, setTanggalAwal] = useState('');
   const [tanggalAkhir, setTanggalAkhir] = useState('');
   const [apiKey, setApiKey] = useState('');
@@ -41,57 +41,57 @@ export default function MainContent({ endpoint, user, onOpenLogin }) {
   };
 
   return (
-    <main className="flex-1 overflow-y-auto p-10 space-y-8 bg-slate-50">
+    <main className={`flex-1 overflow-y-auto p-10 space-y-8 transition-colors ${isDarkMode ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-800'}`}>
       {/* Informational Banner */}
-      <div className="bg-emerald-900/5 border border-emerald-200 rounded-2xl p-5 text-sm space-y-2">
-        <div className="font-bold text-emerald-900 text-base flex items-center gap-2">
+      <div className={`border rounded-2xl p-5 text-sm space-y-2 ${isDarkMode ? 'bg-emerald-950/20 border-emerald-900/60 text-emerald-200' : 'bg-emerald-900/5 border-emerald-200 text-slate-700'}`}>
+        <div className="font-bold text-emerald-400 text-base flex items-center gap-2">
           <span>📅 Informasi Periode Default Tanggal</span>
         </div>
-        <p className="text-slate-700 leading-relaxed">
-          Jika parameter <code className="bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-mono font-semibold">tanggal_awal</code> dan <code className="bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-mono font-semibold">tanggal_akhir</code> tidak dikirim, sistem otomatis memproses data periode <strong>tanggal 5 bulan berjalan hingga tanggal 4 bulan depan</strong>[cite: 1].
+        <p className="leading-relaxed">
+          Jika parameter <code className="bg-emerald-900/40 text-emerald-300 px-1.5 py-0.5 rounded font-mono font-semibold">tanggal_awal</code> dan <code className="bg-emerald-900/40 text-emerald-300 px-1.5 py-0.5 rounded font-mono font-semibold">tanggal_akhir</code> tidak dikirim, sistem otomatis memproses data periode <strong>tanggal 5 bulan berjalan hingga tanggal 4 bulan depan</strong>[cite: 1].
         </p>
       </div>
 
       {/* Header Endpoint */}
-      <div className="border-b border-slate-200 pb-8 space-y-4">
+      <div className={`border-b pb-8 space-y-4 ${isDarkMode ? 'border-slate-800' : 'border-slate-200'}`}>
         <div className="flex items-center space-x-3">
           <span className="text-sm font-bold px-3.5 py-1 rounded-lg border uppercase bg-emerald-100 text-emerald-800 border-emerald-300">
             {endpoint.method}
           </span>
-          <span className="font-mono text-base text-slate-700 font-semibold bg-slate-200/70 px-3.5 py-1 rounded-lg">
+          <span className={`font-mono text-base font-semibold px-3.5 py-1 rounded-lg ${isDarkMode ? 'bg-slate-800 text-slate-200' : 'bg-slate-200/70 text-slate-700'}`}>
             https://api-rsmanambai.ntbprov.go.id{endpoint.path}
           </span>
         </div>
-        <h1 className="text-3xl font-bold text-slate-900 tracking-tight">{endpoint.title}</h1>
-        <p className="text-slate-600 text-base leading-relaxed">{endpoint.description}</p>
+        <h1 className={`text-3xl font-bold tracking-tight ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{endpoint.title}</h1>
+        <p className={`text-base leading-relaxed ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>{endpoint.description}</p>
       </div>
 
       {/* Table Parameters */}
       <div className="space-y-4">
-        <h3 className="text-base font-bold text-emerald-900 uppercase tracking-wider">Query Parameters</h3>
-        <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+        <h3 className="text-base font-bold text-emerald-500 uppercase tracking-wider">Query Parameters</h3>
+        <div className={`rounded-2xl border overflow-hidden shadow-sm ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
           <table className="w-full text-left text-sm border-collapse">
             <thead>
-              <tr className="bg-slate-100/80 border-b border-slate-200 text-slate-700 font-semibold">
+              <tr className={`border-b font-semibold ${isDarkMode ? 'bg-slate-800/60 border-slate-800 text-slate-300' : 'bg-slate-100/80 border-slate-200 text-slate-700'}`}>
                 <th className="py-3.5 px-5">Parameter</th>
                 <th className="py-3.5 px-5">Lokasi</th>
                 <th className="py-3.5 px-5">Status</th>
                 <th className="py-3.5 px-5">Keterangan</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className={`divide-y ${isDarkMode ? 'divide-slate-800' : 'divide-slate-100'}`}>
               {endpoint.params.map((p, i) => (
-                <tr key={i} className="hover:bg-slate-50/80 transition">
-                  <td className="py-4 px-5 font-mono font-semibold text-emerald-600">{p.name}</td>
-                  <td className="py-4 px-5 text-slate-500 font-mono">{p.type}</td>
+                <tr key={i} className={`transition ${isDarkMode ? 'hover:bg-slate-800/40' : 'hover:bg-slate-50/80'}`}>
+                  <td className="py-4 px-5 font-mono font-semibold text-emerald-500">{p.name}</td>
+                  <td className="py-4 px-5 text-slate-400 font-mono">{p.type}</td>
                   <td className="py-4 px-5">
                     {p.required ? (
                       <span className="bg-rose-100 text-rose-700 font-bold px-2.5 py-1 rounded-md text-xs">Wajib</span>
                     ) : (
-                      <span className="bg-slate-100 text-slate-600 px-2.5 py-1 rounded-md text-xs">Opsional</span>
+                      <span className={`px-2.5 py-1 rounded-md text-xs ${isDarkMode ? 'bg-slate-800 text-slate-400' : 'bg-slate-100 text-slate-600'}`}>Opsional</span>
                     )}
                   </td>
-                  <td className="py-4 px-5 text-slate-700 leading-relaxed">{p.desc}</td>
+                  <td className={`py-4 px-5 leading-relaxed ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>{p.desc}</td>
                 </tr>
               ))}
             </tbody>
@@ -100,38 +100,38 @@ export default function MainContent({ endpoint, user, onOpenLogin }) {
       </div>
 
       {/* Console Pengujian TERPROTEKSI */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-sm relative overflow-hidden">
-        <h4 className="text-sm font-bold text-slate-900 uppercase">⚡ Console Pengujian API Real-Time</h4>
+      <div className={`border rounded-2xl p-6 space-y-4 shadow-sm relative overflow-hidden ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
+        <h4 className={`text-sm font-bold uppercase ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>⚡ Console Pengujian API Real-Time</h4>
         
         {user ? (
           <>
             <div className="grid grid-cols-3 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-600 mb-1">API Key / Bearer Token</label>
+                <label className={`block text-xs font-semibold mb-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>API Key / Bearer Token</label>
                 <input
                   type="password"
                   placeholder="Masukkan Token Rahasia..."
                   value={apiKey}
                   onChange={(e) => setApiKey(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 font-mono"
+                  className={`w-full border rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 font-mono ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-800'}`}
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-slate-600 mb-1">Tanggal Awal</label>
+                <label className={`block text-xs font-semibold mb-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>Tanggal Awal</label>
                 <input
                   type="date"
                   value={tanggalAwal}
                   onChange={(e) => setTanggalAwal(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500"
+                  className={`w-full border rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-800'}`}
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-slate-600 mb-1">Tanggal Akhir</label>
+                <label className={`block text-xs font-semibold mb-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>Tanggal Akhir</label>
                 <input
                   type="date"
                   value={tanggalAkhir}
                   onChange={(e) => setTanggalAkhir(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500"
+                  className={`w-full border rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-800'}`}
                 />
               </div>
             </div>
@@ -145,10 +145,10 @@ export default function MainContent({ endpoint, user, onOpenLogin }) {
             </button>
           </>
         ) : (
-          <div className="bg-slate-50 border border-dashed border-slate-300 rounded-xl p-8 text-center space-y-3">
+          <div className={`border border-dashed rounded-xl p-8 text-center space-y-3 ${isDarkMode ? 'bg-slate-800/40 border-slate-700' : 'bg-slate-50 border-slate-300'}`}>
             <div className="text-2xl">🔒</div>
-            <h5 className="font-bold text-slate-800 text-sm">Fitur Kirim Request Dibatasi</h5>
-            <p className="text-xs text-slate-500 max-w-md mx-auto">
+            <h5 className={`font-bold text-sm ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>Fitur Kirim Request Dibatasi</h5>
+            <p className={`text-xs max-w-md mx-auto ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
               Anda perlu masuk terlebih dahulu untuk menggunakan konsol pengujian interaktif dan mengirim *request* ke server.
             </p>
             <button

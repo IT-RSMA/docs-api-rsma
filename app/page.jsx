@@ -13,6 +13,7 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [user, setUser] = useState(null);
+  const [isDarkMode, setIsDarkMode] = useState(false); // State Dark Mode
 
   const activeEndpoint = useMemo(() => {
     for (const cat of API_DATA) {
@@ -35,13 +36,15 @@ export default function Home() {
   }, [searchQuery]);
 
   return (
-    <div className="flex flex-col h-screen bg-slate-50 font-sans overflow-hidden">
+    <div className={`flex flex-col h-screen font-sans overflow-hidden transition-colors duration-200 ${isDarkMode ? 'dark bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-800'}`}>
       <Header
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         user={user}
         onOpenLogin={() => setIsLoginModalOpen(true)}
         onLogout={() => setUser(null)}
+        isDarkMode={isDarkMode}
+        onToggleDarkMode={() => setIsDarkMode(!isDarkMode)}
       />
       
       <div className="flex flex-1 overflow-hidden">
@@ -49,11 +52,13 @@ export default function Home() {
           data={filteredData}
           selectedId={selectedEndpointId}
           onSelect={(id) => setSelectedEndpointId(id)}
+          isDarkMode={isDarkMode}
         />
         <MainContent
           endpoint={activeEndpoint}
           user={user}
           onOpenLogin={() => setIsLoginModalOpen(true)}
+          isDarkMode={isDarkMode}
         />
         <CodePanel endpoint={activeEndpoint} />
       </div>
@@ -62,6 +67,7 @@ export default function Home() {
         isOpen={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}
         onLoginSuccess={(userData) => setUser(userData)}
+        isDarkMode={isDarkMode}
       />
     </div>
   );
