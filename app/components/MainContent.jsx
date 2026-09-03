@@ -4,8 +4,49 @@ export default function MainContent({ endpoint, user, onOpenLogin, isDarkMode })
   const [tanggalAwal, setTanggalAwal] = useState('');
   const [tanggalAkhir, setTanggalAkhir] = useState('');
   const [apiKey, setApiKey] = useState('');
+  
+  // State untuk perolehan token
+  const [clientId, setClientId] = useState('');
+  const [clientSecret, setClientSecret] = useState('');
+  const [isGettingToken, setIsGettingToken] = useState(false);
+  
   const [loading, setLoading] = useState(false);
   const [apiResult, setApiResult] = useState(null);
+
+  // Fungsi khusus untuk meminta Bearer Token
+  const handleGetToken = async () => {
+    if (!clientId || !clientSecret) {
+      alert('Harap isi Client ID dan Client Secret terlebih dahulu!');
+      return;
+    }
+
+    setIsGettingToken(true);
+    try {
+      const response = await fetch('https://api-rsmanambai.ntbprov.go.id/api/auth/token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          client_id: clientId,
+          client_secret: clientSecret
+        })
+      });
+      const data = await response.json();
+      
+      if (data?.data?.access_token) {
+        setApiKey(data.data.access_token);
+        setApiResult({ status: response.status, payload: data });
+      } else {
+        setApiResult({ status: response.status, payload: data });
+      }
+    } catch (error) {
+      setApiResult({ status: 'ERROR', error: 'Gagal mendapatkan token', details: error.message });
+    } finally {
+      setIsGettingToken(false);
+    }
+  };
 
   const handleRealApiTest = async () => {
     if (!user) return;
@@ -99,57 +140,92 @@ export default function MainContent({ endpoint, user, onOpenLogin, isDarkMode })
         </div>
       </div>
 
-      {/* Console Pengujian TERPROTEKSI */}
-      <div className={`border rounded-2xl p-6 space-y-4 shadow-sm relative overflow-hidden ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
-        <h4 className={`text-sm font-bold uppercase ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>⚡ Console Pengujian API Real-Time</h4>
+      {/* Console Pengujian & Perolehan Token TERPROTEKSI */}
+      <div className={`border rounded-2xl p-6 space-y-6 shadow-sm relative overflow-hidden ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
+        <h4 className={`text-sm font-bold uppercase ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>⚡ Console Pengujian & Autentikasi API</h4>
         
         {user ? (
           <>
-            <div className="grid grid-cols-3 gap-4">
-              <div>
-                <label className={`block text-xs font-semibold mb-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>API Key / Bearer Token</label>
+            {/* Form Generate Token */}
+            <div className={`p-4 rounded-xl border space-y-3 ${isDarkMode ? 'bg-slate-950/60 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-emerald-500 uppercase">1. Ambil Bearer Token</span>
+                <span className="text-[11px] text-slate-400">Gunakan Client ID & Secret dari Tim IT</span>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <input
+                  type="text"
+                  placeholder="Client ID..."
+                  value={clientId}
+                  onChange={(e) => setClientId(e.target.value)}
+                  className={`border rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-emerald-500 font-mono ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-white border-slate-200 text-slate-800'}`}
+                />
                 <input
                   type="password"
-                  placeholder="Masukkan Token Rahasia..."
-                  value={apiKey}
-                  onChange={(e) => setApiKey(e.target.value)}
-                  className={`w-full border rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 font-mono ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-800'}`}
+                  placeholder="Client Secret..."
+                  value={clientSecret}
+                  onChange={(e) => setClientSecret(e.target.value)}
+                  className={`border rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-emerald-500 font-mono ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-white border-slate-200 text-slate-800'}`}
                 />
               </div>
-              <div>
-                <label className={`block text-xs font-semibold mb-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>Tanggal Awal</label>
-                <input
-                  type="date"
-                  value={tanggalAwal}
-                  onChange={(e) => setTanggalAwal(e.target.value)}
-                  className={`w-full border rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-800'}`}
-                />
-              </div>
-              <div>
-                <label className={`block text-xs font-semibold mb-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>Tanggal Akhir</label>
-                <input
-                  type="date"
-                  value={tanggalAkhir}
-                  onChange={(e) => setTanggalAkhir(e.target.value)}
-                  className={`w-full border rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-800'}`}
-                />
-              </div>
+              <button
+                onClick={handleGetToken}
+                disabled={isGettingToken}
+                className="bg-slate-800 hover:bg-slate-700 text-emerald-400 font-semibold text-xs px-4 py-2 rounded-xl border border-slate-700 transition disabled:opacity-50 w-full"
+              >
+                {isGettingToken ? 'Meminta Token...' : '🔑 Generate Bearer Token'}
+              </button>
             </div>
 
-            <button
-              onClick={handleRealApiTest}
-              disabled={loading}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition disabled:opacity-50 shadow-sm w-full"
-            >
-              {loading ? 'Menghubungi Server RSUD Manambai...' : 'Kirim Request ke https://api-rsmanambai.ntbprov.go.id'}
-            </button>
+            {/* Form Test Endpoint */}
+            <div className="space-y-3">
+              <span className="text-xs font-bold text-emerald-500 uppercase">2. Kirim Request Endpoint</span>
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <label className={`block text-xs font-semibold mb-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>Active Bearer Token</label>
+                  <input
+                    type="password"
+                    placeholder="Token akan terisi otomatis..."
+                    value={apiKey}
+                    onChange={(e) => setApiKey(e.target.value)}
+                    className={`w-full border rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 font-mono ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-800'}`}
+                  />
+                </div>
+                <div>
+                  <label className={`block text-xs font-semibold mb-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>Tanggal Awal</label>
+                  <input
+                    type="date"
+                    value={tanggalAwal}
+                    onChange={(e) => setTanggalAwal(e.target.value)}
+                    className={`w-full border rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-800'}`}
+                  />
+                </div>
+                <div>
+                  <label className={`block text-xs font-semibold mb-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>Tanggal Akhir</label>
+                  <input
+                    type="date"
+                    value={tanggalAkhir}
+                    onChange={(e) => setTanggalAkhir(e.target.value)}
+                    className={`w-full border rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-800'}`}
+                  />
+                </div>
+              </div>
+
+              <button
+                onClick={handleRealApiTest}
+                disabled={loading}
+                className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition disabled:opacity-50 shadow-sm w-full"
+              >
+                {loading ? 'Menghubungi Server RSUD Manambai...' : 'Kirim Request ke Endpoint'}
+              </button>
+            </div>
           </>
         ) : (
           <div className={`border border-dashed rounded-xl p-8 text-center space-y-3 ${isDarkMode ? 'bg-slate-800/40 border-slate-700' : 'bg-slate-50 border-slate-300'}`}>
             <div className="text-2xl">🔒</div>
             <h5 className={`font-bold text-sm ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>Fitur Kirim Request Dibatasi</h5>
             <p className={`text-xs max-w-md mx-auto ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-              Anda perlu masuk terlebih dahulu untuk menggunakan konsol pengujian interaktif dan mengirim *request* ke server.
+              Anda perlu masuk terlebih dahulu untuk menggunakan konsol perolehan token dan pengujian API.
             </p>
             <button
               onClick={onOpenLogin}
