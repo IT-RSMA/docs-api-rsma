@@ -8,7 +8,7 @@ export default function Header({ searchQuery, setSearchQuery, user, onOpenLogin,
         <div>
           <div className="flex items-center space-x-2.5">
             <span className={`font-bold text-lg leading-none ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
-              API RSUD Manambai Abdul Kadir
+              API RS H.L Manambai AbdulKadir
             </span>
             <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${isDarkMode ? 'bg-emerald-950 text-emerald-300 border-emerald-800' : 'bg-emerald-100 text-emerald-800 border-emerald-200'}`}>
               v1.0.0

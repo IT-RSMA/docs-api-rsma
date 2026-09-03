@@ -5,15 +5,41 @@ export default function MainContent({ endpoint, user, onOpenLogin, isDarkMode })
   const [tanggalAkhir, setTanggalAkhir] = useState('');
   const [apiKey, setApiKey] = useState('');
   
-  // State untuk perolehan token
+  // State perolehan token
   const [clientId, setClientId] = useState('');
   const [clientSecret, setClientSecret] = useState('');
   const [isGettingToken, setIsGettingToken] = useState(false);
   
   const [loading, setLoading] = useState(false);
   const [apiResult, setApiResult] = useState(null);
+  
+  // State Feedback Copas
+  const [copiedUrl, setCopiedUrl] = useState(false);
+  const [copiedJson, setCopiedJson] = useState(false);
 
-  // Fungsi khusus untuk meminta Bearer Token
+  // Merekap URL Penuh dengan Query Params untuk Kominfo
+  const getFullUrl = () => {
+    let url = `https://api-rsmanambai.ntbprov.go.id${endpoint.path}`;
+    const queryParams = new URLSearchParams();
+    if (tanggalAwal) queryParams.append('tanggal_awal', tanggalAwal);
+    if (tanggalAkhir) queryParams.append('tanggal_akhir', tanggalAkhir);
+    if (queryParams.toString()) {
+      url += `?${queryParams.toString()}`;
+    }
+    return url;
+  };
+
+  const handleCopyText = (text, type) => {
+    navigator.clipboard.writeText(text);
+    if (type === 'url') {
+      setCopiedUrl(true);
+      setTimeout(() => setCopiedUrl(false), 2000);
+    } else {
+      setCopiedJson(true);
+      setTimeout(() => setCopiedJson(false), 2000);
+    }
+  };
+
   const handleGetToken = async () => {
     if (!clientId || !clientSecret) {
       alert('Harap isi Client ID dan Client Secret terlebih dahulu!');
@@ -28,19 +54,13 @@ export default function MainContent({ endpoint, user, onOpenLogin, isDarkMode })
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
-        body: JSON.stringify({
-          client_id: clientId,
-          client_secret: clientSecret
-        })
+        body: JSON.stringify({ client_id: clientId, client_secret: clientSecret })
       });
       const data = await response.json();
-      
       if (data?.data?.access_token) {
         setApiKey(data.data.access_token);
-        setApiResult({ status: response.status, payload: data });
-      } else {
-        setApiResult({ status: response.status, payload: data });
       }
+      setApiResult({ status: response.status, payload: data });
     } catch (error) {
       setApiResult({ status: 'ERROR', error: 'Gagal mendapatkan token', details: error.message });
     } finally {
@@ -54,18 +74,8 @@ export default function MainContent({ endpoint, user, onOpenLogin, isDarkMode })
     setLoading(true);
     setApiResult(null);
 
-    let url = `https://api-rsmanambai.ntbprov.go.id${endpoint.path}`;
-    const queryParams = new URLSearchParams();
-    
-    if (tanggalAwal) queryParams.append('tanggal_awal', tanggalAwal);
-    if (tanggalAkhir) queryParams.append('tanggal_akhir', tanggalAkhir);
-    
-    if (queryParams.toString()) {
-      url += `?${queryParams.toString()}`;
-    }
-
     try {
-      const response = await fetch(url, {
+      const response = await fetch(getFullUrl(), {
         method: endpoint.method,
         headers: {
           'Authorization': `Bearer ${apiKey || 'YOUR_API_KEY_HERE'}`,
@@ -83,6 +93,7 @@ export default function MainContent({ endpoint, user, onOpenLogin, isDarkMode })
 
   return (
     <main className={`flex-1 overflow-y-auto p-10 space-y-8 transition-colors ${isDarkMode ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-800'}`}>
+      
       {/* Informational Banner */}
       <div className={`border rounded-2xl p-5 text-sm space-y-2 ${isDarkMode ? 'bg-emerald-950/20 border-emerald-900/60 text-emerald-200' : 'bg-emerald-900/5 border-emerald-200 text-slate-700'}`}>
         <div className="font-bold text-emerald-400 text-base flex items-center gap-2">
@@ -100,7 +111,7 @@ export default function MainContent({ endpoint, user, onOpenLogin, isDarkMode })
             {endpoint.method}
           </span>
           <span className={`font-mono text-base font-semibold px-3.5 py-1 rounded-lg ${isDarkMode ? 'bg-slate-800 text-slate-200' : 'bg-slate-200/70 text-slate-700'}`}>
-            https://api-rsmanambai.ntbprov.go.id{endpoint.path}
+            {getFullUrl()}
           </span>
         </div>
         <h1 className={`text-3xl font-bold tracking-tight ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{endpoint.title}</h1>
@@ -137,6 +148,22 @@ export default function MainContent({ endpoint, user, onOpenLogin, isDarkMode })
               ))}
             </tbody>
           </table>
+        </div>
+      </div>
+
+      {/* KONTEN KHUSUS KOMINFO: QUICK COPY URL ENDPOINT */}
+      <div className={`border rounded-2xl p-6 space-y-3 ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-bold text-emerald-500 uppercase tracking-wider">📋 Hasil Endpoints</span>
+          <button
+            onClick={() => handleCopyText(getFullUrl(), 'url')}
+            className="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-3 py-1.5 rounded-lg transition"
+          >
+            {copiedUrl ? '✓ URL Copied' : '📄 Copas URL Endpoint'}
+          </button>
+        </div>
+        <div className={`font-mono text-xs p-3 rounded-xl border overflow-x-auto ${isDarkMode ? 'bg-slate-950 border-slate-800 text-emerald-300' : 'bg-slate-100 border-slate-200 text-emerald-700'}`}>
+          {getFullUrl()}
         </div>
       </div>
 
@@ -185,7 +212,7 @@ export default function MainContent({ endpoint, user, onOpenLogin, isDarkMode })
                   <label className={`block text-xs font-semibold mb-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>Active Bearer Token</label>
                   <input
                     type="password"
-                    placeholder="Token akan terisi otomatis..."
+                    placeholder="Token terisi otomatis..."
                     value={apiKey}
                     onChange={(e) => setApiKey(e.target.value)}
                     className={`w-full border rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 font-mono ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-800'}`}
@@ -237,14 +264,22 @@ export default function MainContent({ endpoint, user, onOpenLogin, isDarkMode })
         )}
       </div>
 
-      {/* Output Respon Real */}
+      {/* Output Respon Real dengan Tombol Copas JSON Kominfo */}
       {user && apiResult && (
         <div className="bg-slate-900 text-slate-100 p-6 rounded-2xl border border-slate-800 space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider">Hasil Response Server Real-time:</span>
-            <span className="text-xs font-mono bg-slate-800 px-2.5 py-1 rounded border border-slate-700 text-amber-300">
-              HTTP Status: {apiResult.status}
-            </span>
+            <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider">Hasil Response Server (Copas Kominfo Ready):</span>
+            <div className="flex items-center gap-3">
+              <span className="text-xs font-mono bg-slate-800 px-2.5 py-1 rounded border border-slate-700 text-amber-300">
+                HTTP Status: {apiResult.status}
+              </span>
+              <button
+                onClick={() => handleCopyText(JSON.stringify(apiResult.payload || apiResult, null, 2), 'json')}
+                className="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-3 py-1 rounded-lg transition"
+              >
+                {copiedJson ? '✓ JSON Copied' : '📋 Copas JSON Output'}
+              </button>
+            </div>
           </div>
           <pre className="text-sm font-mono overflow-x-auto text-slate-200 leading-relaxed bg-slate-950 p-4 rounded-xl">
             <code>{JSON.stringify(apiResult.payload || apiResult, null, 2)}</code>

@@ -7,7 +7,7 @@ export const API_DATA = [
         title: 'Mendapatkan Bearer Token',
         method: 'POST',
         path: '/api/auth/token',
-        description: 'Endpoint ini digunakan untuk mendapatkan Bearer JWT Token yang sah menggunakan Client ID dan Client Secret yang telah didaftarkan oleh Tim IT RSUD Manambai Abdul Kadir.',
+        description: 'Endpoint ini digunakan untuk mendapatkan Bearer JWT Token yang sah menggunakan Client ID dan Client Secret yang telah didaftarkan oleh Tim IT RS H.L Manambai AbdulKadir.',
         authRequired: false,
         params: [
           { name: 'client_id', type: 'body', required: true, desc: 'Client ID resmi instansi/dinas Anda.' },
@@ -66,7 +66,7 @@ export const API_DATA = [
         responses: {
           200: {
             success: true,
-            instansi: { nama_instansi: 'RSUD Manambai Abdul Kadir', kode_ppk_kemenkes: '5204013' },
+            instansi: { nama_instansi: 'RS H.L Manambai AbdulKadir', kode_ppk_kemenkes: '5204013' },
             data: { tanggal_awal: '2026-08-05', tanggal_akhir: '2026-09-04', jumlah_kunjungan_ralan: 3240 }
           },
           422: {
@@ -90,7 +90,7 @@ export const API_DATA = [
         responses: {
           200: {
             success: true,
-            instansi: { nama_instansi: 'RSUD Manambai Abdul Kadir', kode_ppk_kemenkes: '5204013' },
+            instansi: { nama_instansi: 'RS H.L Manambai AbdulKadir', kode_ppk_kemenkes: '5204013' },
             data: {
               tanggal_awal: '2026-08-05',
               tanggal_akhir: '2026-09-04',
@@ -117,7 +117,7 @@ export const API_DATA = [
         responses: {
           200: {
             success: true,
-            instansi: { nama_instansi: 'RSUD Manambai Abdul Kadir', kode_ppk_kemenkes: '5204013' },
+            instansi: { nama_instansi: 'RS H.L Manambai AbdulKadir', kode_ppk_kemenkes: '5204013' },
             data: {
               tanggal_awal: '2026-08-05',
               tanggal_akhir: '2026-09-04',
@@ -149,7 +149,7 @@ export const API_DATA = [
         responses: {
           200: {
             success: true,
-            instansi: { nama_instansi: 'RSUD Manambai Abdul Kadir', kode_ppk_kemenkes: '5204013' },
+            instansi: { nama_instansi: 'RS H.L Manambai AbdulKadir', kode_ppk_kemenkes: '5204013' },
             data: { tanggal_awal: '2026-08-05', tanggal_akhir: '2026-09-04', jumlah_kunjungan_ranap: 410 }
           }
         }
@@ -169,7 +169,7 @@ export const API_DATA = [
         responses: {
           200: {
             success: true,
-            instansi: { nama_instansi: 'RSUD Manambai Abdul Kadir', kode_ppk_kemenkes: '5204013' },
+            instansi: { nama_instansi: 'RS H.L Manambai AbdulKadir', kode_ppk_kemenkes: '5204013' },
             data: {
               tanggal_awal: '2026-08-05',
               tanggal_akhir: '2026-09-04',
@@ -201,7 +201,7 @@ export const API_DATA = [
         responses: {
           200: {
             success: true,
-            instansi: { nama_instansi: 'RSUD Manambai Abdul Kadir', kode_ppk_kemenkes: '5204013' },
+            instansi: { nama_instansi: 'RS H.L Manambai AbdulKadir', kode_ppk_kemenkes: '5204013' },
             data: { tanggal_awal: '2026-08-05', tanggal_akhir: '2026-09-04', jumlah_kunjungan_igd: 187 }
           }
         }
@@ -221,7 +221,7 @@ export const API_DATA = [
         responses: {
           200: {
             success: true,
-            instansi: { nama_instansi: 'RSUD Manambai Abdul Kadir', kode_ppk_kemenkes: '5204013' },
+            instansi: { nama_instansi: 'RS H.L Manambai AbdulKadir', kode_ppk_kemenkes: '5204013' },
             data: {
               tanggal_awal: '2026-08-05',
               tanggal_akhir: '2026-09-04',
@@ -253,7 +253,7 @@ export const API_DATA = [
         responses: {
           200: {
             success: true,
-            instansi: { nama_instansi: 'RSUD Manambai Abdul Kadir', kode_ppk_kemenkes: '5204013' },
+            instansi: { nama_instansi: 'RS H.L Manambai AbdulKadir', kode_ppk_kemenkes: '5204013' },
             data: {
               tanggal_awal: '2026-08-05',
               tanggal_akhir: '2026-09-04',
@@ -280,7 +280,7 @@ export const API_DATA = [
         responses: {
           200: {
             success: true,
-            instansi: { nama_instansi: 'RSUD Manambai Abdul Kadir', kode_ppk_kemenkes: '5204013' },
+            instansi: { nama_instansi: 'RS H.L Manambai AbdulKadir', kode_ppk_kemenkes: '5204013' },
             data: {
               tanggal_awal: '2026-08-05',
               tanggal_akhir: '2026-09-04',
@@ -306,7 +306,7 @@ export const API_DATA = [
         responses: {
           200: {
             success: true,
-            instansi: { nama_instansi: 'RSUD Manambai Abdul Kadir', kode_ppk_kemenkes: '5204013' },
+            instansi: { nama_instansi: 'RS H.L Manambai AbdulKadir', kode_ppk_kemenkes: '5204013' },
             data: {
               tanggal_awal: '2026-08-05',
               tanggal_akhir: '2026-09-04',
@@ -339,7 +339,7 @@ export const API_DATA = [
         responses: {
           200: {
             success: true,
-            instansi: { nama_instansi: 'RSUD Manambai Abdul Kadir', kode_ppk_kemenkes: '5204013' },
+            instansi: { nama_instansi: 'RS H.L Manambai AbdulKadir', kode_ppk_kemenkes: '5204013' },
             data: {
               tanggal_awal: '2026-08-05',
               tanggal_akhir: '2026-09-04',
@@ -365,7 +365,7 @@ export const API_DATA = [
         responses: {
           200: {
             success: true,
-            instansi: { nama_instansi: 'RSUD Manambai Abdul Kadir', kode_ppk_kemenkes: '5204013' },
+            instansi: { nama_instansi: 'RS H.L Manambai AbdulKadir', kode_ppk_kemenkes: '5204013' },
             data: {
               tanggal_awal: '2026-08-05',
               tanggal_akhir: '2026-09-04',
@@ -391,7 +391,7 @@ export const API_DATA = [
         responses: {
           200: {
             success: true,
-            instansi: { nama_instansi: 'RSUD Manambai Abdul Kadir', kode_ppk_kemenkes: '5204013' },
+            instansi: { nama_instansi: 'RS H.L Manambai AbdulKadir', kode_ppk_kemenkes: '5204013' },
             data: {
               tanggal_awal: '2026-08-05',
               tanggal_akhir: '2026-09-04',
