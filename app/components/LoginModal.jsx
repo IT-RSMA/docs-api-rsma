@@ -1,20 +1,32 @@
 import { useState } from 'react';
+import { loginUserApi } from '../lib/apiClient';
 
 export default function LoginModal({ isOpen, onClose, onLoginSuccess, isDarkMode }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (username === 'admin' && password === 'admin123') {
-      onLoginSuccess({ username: 'admin', name: 'User Terautentikasi' });
+    setLoading(true);
+    setError('');
+
+    const res = await loginUserApi(username, password);
+    setLoading(false);
+
+    if (res.ok && res.data?.data?.access_token) {
+      onLoginSuccess({
+        username: username,
+        name: res.data.data.user?.name || username,
+        token: res.data.data.access_token,
+      });
       setError('');
       onClose();
     } else {
-      setError('Username atau password salah! (Coba: admin / admin123)');
+      setError(res.data?.message || 'Login gagal! Periksa username/email & password atau server backend.');
     }
   };
 
@@ -32,17 +44,19 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, isDarkMode
         </div>
 
         {error && (
-          <div className="bg-rose-50 border border-rose-200 text-rose-700 text-xs p-3 rounded-xl">
+          <div className="bg-rose-500/10 border border-rose-500/30 text-rose-500 text-xs p-3 rounded-xl">
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className={`block text-xs font-semibold mb-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>Username</label>
+            <label className={`block text-xs font-semibold mb-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+              Username / Email
+            </label>
             <input
               type="text"
-              placeholder="Masukkan username..."
+              placeholder="Contoh: IT atau kominfo@sumbawakab.go.id"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               className={`w-full border rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-emerald-500 ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-800'}`}
@@ -51,10 +65,12 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, isDarkMode
           </div>
 
           <div>
-            <label className={`block text-xs font-semibold mb-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>Password</label>
+            <label className={`block text-xs font-semibold mb-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+              Password
+            </label>
             <input
               type="password"
-              placeholder="Masukkan password..."
+              placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className={`w-full border rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-emerald-500 ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-800'}`}
@@ -62,11 +78,41 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, isDarkMode
             />
           </div>
 
+          {/* Quick-Fill Testing Helper */}
+          <div>
+            <span className={`block text-[11px] font-semibold mb-1.5 ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>
+              Akun Cepat (Testing / Demo):
+            </span>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setUsername('IT');
+                  setPassword('2025');
+                }}
+                className={`text-[11px] px-2.5 py-1.5 rounded-lg border font-medium transition ${isDarkMode ? 'bg-slate-800 border-slate-700 text-emerald-400 hover:bg-slate-700' : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200'}`}
+              >
+                ⚡ IT RSMA (2025)
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setUsername('kominfo@sumbawakab.go.id');
+                  setPassword('PasswordKominfo2026!');
+                }}
+                className={`text-[11px] px-2.5 py-1.5 rounded-lg border font-medium transition ${isDarkMode ? 'bg-slate-800 border-slate-700 text-emerald-400 hover:bg-slate-700' : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200'}`}
+              >
+                ⚡ Kominfo
+              </button>
+            </div>
+          </div>
+
           <button
             type="submit"
-            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm py-2.5 rounded-xl transition shadow-sm mt-2"
+            disabled={loading}
+            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm py-2.5 rounded-xl transition shadow-sm mt-2 disabled:opacity-50"
           >
-            Masuk
+            {loading ? 'Memverifikasi...' : 'Masuk'}
           </button>
         </form>
       </div>

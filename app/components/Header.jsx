@@ -1,4 +1,9 @@
+'use client';
+
+import { BASE_URL } from '../lib/apiClient';
+
 export default function Header({ searchQuery, setSearchQuery, user, onOpenLogin, onLogout, isDarkMode, onToggleDarkMode }) {
+
   return (
     <header className={`h-20 border-b flex items-center justify-between px-8 z-20 shrink-0 shadow-sm transition-colors ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
       <div className="flex items-center space-x-4">
@@ -14,7 +19,7 @@ export default function Header({ searchQuery, setSearchQuery, user, onOpenLogin,
               v1.0.0
             </span>
           </div>
-          <p className={`text-sm mt-1 font-mono ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>https://api-rsmanambai.ntbprov.go.id</p>
+          <p className={`text-sm mt-1 font-mono ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>{BASE_URL}</p>
         </div>
       </div>
 
@@ -39,10 +44,11 @@ export default function Header({ searchQuery, setSearchQuery, user, onOpenLogin,
         </button>
 
         {user ? (
-          <div className="flex items-center space-x-3">
-            <span className={`text-xs font-semibold border px-3 py-2 rounded-xl ${isDarkMode ? 'bg-emerald-950/60 text-emerald-300 border-emerald-800' : 'bg-emerald-50 text-emerald-800 border-emerald-200'}`}>
-              👤 {user.name}
-            </span>
+          <div className="flex items-center space-x-2.5">
+            <div className={`flex items-center gap-2 text-xs font-semibold border px-3 py-2 rounded-xl ${isDarkMode ? 'bg-emerald-950/60 text-emerald-300 border-emerald-800' : 'bg-emerald-50 text-emerald-800 border-emerald-200'}`}>
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>{user.name}</span>
+            </div>
             <button
               onClick={onLogout}
               className="text-xs bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 px-3.5 py-2 rounded-xl font-semibold transition"
@@ -53,9 +59,10 @@ export default function Header({ searchQuery, setSearchQuery, user, onOpenLogin,
         ) : (
           <button
             onClick={onOpenLogin}
-            className="text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl font-semibold transition shadow-sm"
+            className="text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl font-semibold transition shadow-sm flex items-center gap-1.5"
           >
-            🔑 Login untuk Test API
+            <span>🔑</span>
+            <span>Login Instansi</span>
           </button>
         )}
       </div>

@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { API_DATA } from './data/apiData';
+import { logoutUserApi, getSavedToken, getSavedClientName, getAuthUser } from './lib/apiClient';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import MainContent from './components/MainContent';
@@ -13,7 +14,17 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [user, setUser] = useState(null);
-  const [isDarkMode, setIsDarkMode] = useState(false); // State Dark Mode
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  // Cek token tersimpan saat halaman dibuka ulang
+  useEffect(() => {
+    const token = getSavedToken();
+    const authUser = getAuthUser();
+    const name = authUser?.name || getSavedClientName();
+    if (token) {
+      setUser({ name: name || 'Instansi Terautentikasi', token, ...authUser });
+    }
+  }, []);
 
   const activeEndpoint = useMemo(() => {
     for (const cat of API_DATA) {
@@ -22,6 +33,12 @@ export default function Home() {
     }
     return API_DATA[0].endpoints[0];
   }, [selectedEndpointId]);
+
+  // Reset live response saat ganti endpoint
+  const handleSelectEndpoint = (id) => {
+    setSelectedEndpointId(id);
+    setLiveResponse(null);
+  };
 
   const filteredData = useMemo(() => {
     if (!searchQuery) return API_DATA;
@@ -35,6 +52,11 @@ export default function Home() {
     })).filter((cat) => cat.endpoints.length > 0);
   }, [searchQuery]);
 
+  const handleLogout = async () => {
+    await logoutUserApi();
+    setUser(null);
+  };
+
   return (
     <div className={`flex flex-col h-screen font-sans overflow-hidden transition-colors duration-200 ${isDarkMode ? 'dark bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-800'}`}>
       <Header
@@ -42,7 +64,7 @@ export default function Home() {
         setSearchQuery={setSearchQuery}
         user={user}
         onOpenLogin={() => setIsLoginModalOpen(true)}
-        onLogout={() => setUser(null)}
+        onLogout={handleLogout}
         isDarkMode={isDarkMode}
         onToggleDarkMode={() => setIsDarkMode(!isDarkMode)}
       />
@@ -51,16 +73,18 @@ export default function Home() {
         <Sidebar
           data={filteredData}
           selectedId={selectedEndpointId}
-          onSelect={(id) => setSelectedEndpointId(id)}
+          onSelect={handleSelectEndpoint}
           isDarkMode={isDarkMode}
         />
         <MainContent
           endpoint={activeEndpoint}
-          user={user}
-          onOpenLogin={() => setIsLoginModalOpen(true)}
           isDarkMode={isDarkMode}
         />
-        <CodePanel endpoint={activeEndpoint} />
+        <CodePanel
+          endpoint={activeEndpoint}
+          user={user}
+          onOpenLogin={() => setIsLoginModalOpen(true)}
+        />
       </div>
 
       <LoginModal

@@ -1,149 +1,100 @@
 import { useState } from 'react';
+import { BASE_URL } from '../lib/apiClient';
 
-export default function MainContent({ endpoint, user, onOpenLogin, isDarkMode }) {
-  const [tanggalAwal, setTanggalAwal] = useState('');
-  const [tanggalAkhir, setTanggalAkhir] = useState('');
-  const [apiKey, setApiKey] = useState('');
-  
-  // State perolehan token
-  const [clientId, setClientId] = useState('');
-  const [clientSecret, setClientSecret] = useState('');
-  const [isGettingToken, setIsGettingToken] = useState(false);
-  
-  const [loading, setLoading] = useState(false);
-  const [apiResult, setApiResult] = useState(null);
-  
-  // State Feedback Copas
+export default function MainContent({ endpoint, isDarkMode }) {
   const [copiedUrl, setCopiedUrl] = useState(false);
-  const [copiedJson, setCopiedJson] = useState(false);
 
-  // Merekap URL Penuh dengan Query Params untuk Kominfo
+  // Merekap URL Endpoint
   const getFullUrl = () => {
-    let url = `https://api-rsmanambai.ntbprov.go.id${endpoint.path}`;
-    const queryParams = new URLSearchParams();
-    if (tanggalAwal) queryParams.append('tanggal_awal', tanggalAwal);
-    if (tanggalAkhir) queryParams.append('tanggal_akhir', tanggalAkhir);
-    if (queryParams.toString()) {
-      url += `?${queryParams.toString()}`;
+    let cleanPath = endpoint.path || '';
+    if (!cleanPath.startsWith('/')) cleanPath = `/${cleanPath}`;
+
+    let base = BASE_URL.endsWith('/') ? BASE_URL.slice(0, -1) : BASE_URL;
+    if (base.endsWith('/api') && cleanPath.startsWith('/api/')) {
+      cleanPath = cleanPath.replace('/api', '');
     }
-    return url;
+
+    return `${base}${cleanPath}`;
   };
 
-  const handleCopyText = (text, type) => {
-    navigator.clipboard.writeText(text);
-    if (type === 'url') {
-      setCopiedUrl(true);
-      setTimeout(() => setCopiedUrl(false), 2000);
-    } else {
-      setCopiedJson(true);
-      setTimeout(() => setCopiedJson(false), 2000);
-    }
-  };
-
-  const handleGetToken = async () => {
-    if (!clientId || !clientSecret) {
-      alert('Harap isi Client ID dan Client Secret terlebih dahulu!');
-      return;
-    }
-
-    setIsGettingToken(true);
-    try {
-      const response = await fetch('https://api-rsmanambai.ntbprov.go.id/api/auth/token', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({ client_id: clientId, client_secret: clientSecret })
-      });
-      const data = await response.json();
-      if (data?.data?.access_token) {
-        setApiKey(data.data.access_token);
-      }
-      setApiResult({ status: response.status, payload: data });
-    } catch (error) {
-      setApiResult({ status: 'ERROR', error: 'Gagal mendapatkan token', details: error.message });
-    } finally {
-      setIsGettingToken(false);
-    }
-  };
-
-  const handleRealApiTest = async () => {
-    if (!user) return;
-
-    setLoading(true);
-    setApiResult(null);
-
-    try {
-      const response = await fetch(getFullUrl(), {
-        method: endpoint.method,
-        headers: {
-          'Authorization': `Bearer ${apiKey || 'YOUR_API_KEY_HERE'}`,
-          'Accept': 'application/json'
-        }
-      });
-      const data = await response.json();
-      setApiResult({ status: response.status, payload: data });
-    } catch (error) {
-      setApiResult({ status: 'ERROR', error: 'Gagal terhubung ke server API RS', details: error.message });
-    } finally {
-      setLoading(false);
-    }
+  const handleCopyUrl = () => {
+    navigator.clipboard.writeText(getFullUrl());
+    setCopiedUrl(true);
+    setTimeout(() => setCopiedUrl(false), 2000);
   };
 
   return (
     <main className={`flex-1 overflow-y-auto p-10 space-y-8 transition-colors ${isDarkMode ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-800'}`}>
       
-      {/* Informational Banner */}
-      <div className={`border rounded-2xl p-5 text-sm space-y-2 ${isDarkMode ? 'bg-emerald-950/20 border-emerald-900/60 text-emerald-200' : 'bg-emerald-900/5 border-emerald-200 text-slate-700'}`}>
-        <div className="font-bold text-emerald-400 text-base flex items-center gap-2">
-          <span>📅 Informasi Periode Default Tanggal</span>
+      {/* Informational Callout (Periode Default) */}
+      <div className={`border rounded-2xl p-4 text-xs space-y-1.5 ${isDarkMode ? 'bg-emerald-950/20 border-emerald-900/50 text-emerald-200' : 'bg-emerald-50 border-emerald-200 text-slate-700'}`}>
+        <div className="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
+          <span>📅 Catatan Periode Default Data</span>
         </div>
         <p className="leading-relaxed">
-          Jika parameter <code className="bg-emerald-900/40 text-emerald-300 px-1.5 py-0.5 rounded font-mono font-semibold">tanggal_awal</code> dan <code className="bg-emerald-900/40 text-emerald-300 px-1.5 py-0.5 rounded font-mono font-semibold">tanggal_akhir</code> tidak dikirim, sistem otomatis memproses data periode <strong>tanggal 5 bulan berjalan hingga tanggal 4 bulan depan</strong>[cite: 1].
+          Jika parameter tanggal tidak diisi, sistem SIMRS secara otomatis memproses data pada rentang <strong>tanggal 5 bulan berjalan s/d tanggal 4 bulan berikutnya</strong>.
         </p>
       </div>
 
-      {/* Header Endpoint */}
-      <div className={`border-b pb-8 space-y-4 ${isDarkMode ? 'border-slate-800' : 'border-slate-200'}`}>
-        <div className="flex items-center space-x-3">
-          <span className="text-sm font-bold px-3.5 py-1 rounded-lg border uppercase bg-emerald-100 text-emerald-800 border-emerald-300">
-            {endpoint.method}
-          </span>
-          <span className={`font-mono text-base font-semibold px-3.5 py-1 rounded-lg ${isDarkMode ? 'bg-slate-800 text-slate-200' : 'bg-slate-200/70 text-slate-700'}`}>
-            {getFullUrl()}
-          </span>
+      {/* Header Endpoint Terpadu (Clean Title + Interactive URL Bar) */}
+      <div className={`border-b pb-7 space-y-4 ${isDarkMode ? 'border-slate-800' : 'border-slate-200'}`}>
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center space-x-2.5 flex-1 min-w-0">
+            <span className={`text-xs font-bold px-3 py-1 rounded-lg border uppercase shrink-0 ${
+              endpoint.method === 'GET' ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-blue-100 text-blue-800 border-blue-300'
+            }`}>
+              {endpoint.method}
+            </span>
+            <div className={`font-mono text-xs font-semibold px-3 py-1.5 rounded-xl border truncate flex-1 ${
+              isDarkMode ? 'bg-slate-900 border-slate-800 text-emerald-400' : 'bg-white border-slate-200 text-emerald-700'
+            }`}>
+              {getFullUrl()}
+            </div>
+          </div>
+          <button
+            onClick={handleCopyUrl}
+            className="text-xs font-semibold px-3.5 py-1.5 rounded-xl border bg-emerald-600 hover:bg-emerald-700 text-white transition shadow-sm shrink-0"
+          >
+            {copiedUrl ? '✓ URL Disalin' : '📋 Copas URL'}
+          </button>
         </div>
-        <h1 className={`text-3xl font-bold tracking-tight ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{endpoint.title}</h1>
-        <p className={`text-base leading-relaxed ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>{endpoint.description}</p>
+
+        <div>
+          <h1 className={`text-2xl font-bold tracking-tight ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{endpoint.title}</h1>
+          <p className={`text-sm mt-1.5 leading-relaxed ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>{endpoint.description}</p>
+        </div>
       </div>
 
       {/* Table Parameters */}
       <div className="space-y-4">
-        <h3 className="text-base font-bold text-emerald-500 uppercase tracking-wider">Query Parameters</h3>
+        <div className="flex items-center justify-between">
+          <h3 className="text-xs font-bold text-emerald-500 uppercase tracking-wider">Query Parameters</h3>
+          <span className="text-[11px] text-slate-400">Parameter yang didukung oleh endpoint ini</span>
+        </div>
+
         <div className={`rounded-2xl border overflow-hidden shadow-sm ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
-          <table className="w-full text-left text-sm border-collapse">
+          <table className="w-full text-left text-xs border-collapse">
             <thead>
               <tr className={`border-b font-semibold ${isDarkMode ? 'bg-slate-800/60 border-slate-800 text-slate-300' : 'bg-slate-100/80 border-slate-200 text-slate-700'}`}>
-                <th className="py-3.5 px-5">Parameter</th>
-                <th className="py-3.5 px-5">Lokasi</th>
-                <th className="py-3.5 px-5">Status</th>
-                <th className="py-3.5 px-5">Keterangan</th>
+                <th className="py-3 px-5">Parameter</th>
+                <th className="py-3 px-5">Tipe</th>
+                <th className="py-3 px-5">Sifat</th>
+                <th className="py-3 px-5">Keterangan</th>
               </tr>
             </thead>
             <tbody className={`divide-y ${isDarkMode ? 'divide-slate-800' : 'divide-slate-100'}`}>
               {endpoint.params.map((p, i) => (
                 <tr key={i} className={`transition ${isDarkMode ? 'hover:bg-slate-800/40' : 'hover:bg-slate-50/80'}`}>
-                  <td className="py-4 px-5 font-mono font-semibold text-emerald-500">{p.name}</td>
-                  <td className="py-4 px-5 text-slate-400 font-mono">{p.type}</td>
-                  <td className="py-4 px-5">
+                  <td className="py-3.5 px-5 font-mono font-bold text-emerald-500">{p.name}</td>
+                  <td className="py-3.5 px-5 text-slate-400 font-mono">{p.type}</td>
+                  <td className="py-3.5 px-5">
                     {p.required ? (
-                      <span className="bg-rose-100 text-rose-700 font-bold px-2.5 py-1 rounded-md text-xs">Wajib</span>
+                      <span className="bg-rose-100 text-rose-700 font-bold px-2 py-0.5 rounded text-[11px]">Wajib</span>
                     ) : (
-                      <span className={`px-2.5 py-1 rounded-md text-xs ${isDarkMode ? 'bg-slate-800 text-slate-400' : 'bg-slate-100 text-slate-600'}`}>Opsional</span>
+                      <span className={`px-2 py-0.5 rounded text-[11px] ${isDarkMode ? 'bg-slate-800 text-slate-400' : 'bg-slate-100 text-slate-600'}`}>Opsional</span>
                     )}
                   </td>
-                  <td className={`py-4 px-5 leading-relaxed ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>{p.desc}</td>
+                  <td className={`py-3.5 px-5 leading-relaxed ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>{p.desc}</td>
                 </tr>
               ))}
             </tbody>
@@ -151,141 +102,16 @@ export default function MainContent({ endpoint, user, onOpenLogin, isDarkMode })
         </div>
       </div>
 
-      {/* KONTEN KHUSUS KOMINFO: QUICK COPY URL ENDPOINT */}
-      <div className={`border rounded-2xl p-6 space-y-3 ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-bold text-emerald-500 uppercase tracking-wider">📋 Hasil Endpoints</span>
-          <button
-            onClick={() => handleCopyText(getFullUrl(), 'url')}
-            className="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-3 py-1.5 rounded-lg transition"
-          >
-            {copiedUrl ? '✓ URL Copied' : '📄 Copas URL Endpoint'}
-          </button>
-        </div>
-        <div className={`font-mono text-xs p-3 rounded-xl border overflow-x-auto ${isDarkMode ? 'bg-slate-950 border-slate-800 text-emerald-300' : 'bg-slate-100 border-slate-200 text-emerald-700'}`}>
-          {getFullUrl()}
-        </div>
+      {/* Keamanan & Otorisasi Notice */}
+      <div className={`border rounded-2xl p-5 space-y-2 ${isDarkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-200'}`}>
+        <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+          <span>🔒 Standar Otorisasi</span>
+        </h4>
+        <p className="text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+          Endpoint ini memerlukan header <code className="bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded font-mono text-emerald-500">Authorization: Bearer &lt;token&gt;</code>. Untuk menguji request secara live dengan database SIMRS, silakan gunakan panel <strong>Try It Out</strong> di sebelah kanan setelah masuk dengan akun instansi.
+        </p>
       </div>
 
-      {/* Console Pengujian & Perolehan Token TERPROTEKSI */}
-      <div className={`border rounded-2xl p-6 space-y-6 shadow-sm relative overflow-hidden ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
-        <h4 className={`text-sm font-bold uppercase ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>⚡ Console Pengujian & Autentikasi API</h4>
-        
-        {user ? (
-          <>
-            {/* Form Generate Token */}
-            <div className={`p-4 rounded-xl border space-y-3 ${isDarkMode ? 'bg-slate-950/60 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-emerald-500 uppercase">1. Ambil Bearer Token</span>
-                <span className="text-[11px] text-slate-400">Gunakan Client ID & Secret dari Tim IT</span>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <input
-                  type="text"
-                  placeholder="Client ID..."
-                  value={clientId}
-                  onChange={(e) => setClientId(e.target.value)}
-                  className={`border rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-emerald-500 font-mono ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-white border-slate-200 text-slate-800'}`}
-                />
-                <input
-                  type="password"
-                  placeholder="Client Secret..."
-                  value={clientSecret}
-                  onChange={(e) => setClientSecret(e.target.value)}
-                  className={`border rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-emerald-500 font-mono ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-white border-slate-200 text-slate-800'}`}
-                />
-              </div>
-              <button
-                onClick={handleGetToken}
-                disabled={isGettingToken}
-                className="bg-slate-800 hover:bg-slate-700 text-emerald-400 font-semibold text-xs px-4 py-2 rounded-xl border border-slate-700 transition disabled:opacity-50 w-full"
-              >
-                {isGettingToken ? 'Meminta Token...' : '🔑 Generate Bearer Token'}
-              </button>
-            </div>
-
-            {/* Form Test Endpoint */}
-            <div className="space-y-3">
-              <span className="text-xs font-bold text-emerald-500 uppercase">2. Kirim Request Endpoint</span>
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <label className={`block text-xs font-semibold mb-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>Active Bearer Token</label>
-                  <input
-                    type="password"
-                    placeholder="Token terisi otomatis..."
-                    value={apiKey}
-                    onChange={(e) => setApiKey(e.target.value)}
-                    className={`w-full border rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 font-mono ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-800'}`}
-                  />
-                </div>
-                <div>
-                  <label className={`block text-xs font-semibold mb-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>Tanggal Awal</label>
-                  <input
-                    type="date"
-                    value={tanggalAwal}
-                    onChange={(e) => setTanggalAwal(e.target.value)}
-                    className={`w-full border rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-800'}`}
-                  />
-                </div>
-                <div>
-                  <label className={`block text-xs font-semibold mb-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>Tanggal Akhir</label>
-                  <input
-                    type="date"
-                    value={tanggalAkhir}
-                    onChange={(e) => setTanggalAkhir(e.target.value)}
-                    className={`w-full border rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500 ${isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-800'}`}
-                  />
-                </div>
-              </div>
-
-              <button
-                onClick={handleRealApiTest}
-                disabled={loading}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition disabled:opacity-50 shadow-sm w-full"
-              >
-                {loading ? 'Menghubungi Server RSUD Manambai...' : 'Kirim Request ke Endpoint'}
-              </button>
-            </div>
-          </>
-        ) : (
-          <div className={`border border-dashed rounded-xl p-8 text-center space-y-3 ${isDarkMode ? 'bg-slate-800/40 border-slate-700' : 'bg-slate-50 border-slate-300'}`}>
-            <div className="text-2xl">🔒</div>
-            <h5 className={`font-bold text-sm ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>Fitur Kirim Request Dibatasi</h5>
-            <p className={`text-xs max-w-md mx-auto ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-              Anda perlu masuk terlebih dahulu untuk menggunakan konsol perolehan token dan pengujian API.
-            </p>
-            <button
-              onClick={onOpenLogin}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs px-4 py-2 rounded-xl transition shadow-sm"
-            >
-              Login Sekarang
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* Output Respon Real dengan Tombol Copas JSON Kominfo */}
-      {user && apiResult && (
-        <div className="bg-slate-900 text-slate-100 p-6 rounded-2xl border border-slate-800 space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider">Hasil Response Server (Copas Kominfo Ready):</span>
-            <div className="flex items-center gap-3">
-              <span className="text-xs font-mono bg-slate-800 px-2.5 py-1 rounded border border-slate-700 text-amber-300">
-                HTTP Status: {apiResult.status}
-              </span>
-              <button
-                onClick={() => handleCopyText(JSON.stringify(apiResult.payload || apiResult, null, 2), 'json')}
-                className="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-3 py-1 rounded-lg transition"
-              >
-                {copiedJson ? '✓ JSON Copied' : '📋 Copas JSON Output'}
-              </button>
-            </div>
-          </div>
-          <pre className="text-sm font-mono overflow-x-auto text-slate-200 leading-relaxed bg-slate-950 p-4 rounded-xl">
-            <code>{JSON.stringify(apiResult.payload || apiResult, null, 2)}</code>
-          </pre>
-        </div>
-      )}
     </main>
   );
 }
