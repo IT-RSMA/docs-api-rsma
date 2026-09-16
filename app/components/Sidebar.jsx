@@ -1,4 +1,29 @@
+import { useState, useCallback } from 'react';
+
 export default function Sidebar({ data, selectedId, onSelect, isDarkMode }) {
+  const [sidebarWidth, setSidebarWidth] = useState(320);
+  const [isResizing, setIsResizing] = useState(false);
+
+  const startResizing = useCallback((e) => {
+    e.preventDefault();
+    setIsResizing(true);
+
+    const handleMouseMove = (moveEvent) => {
+      const newWidth = moveEvent.clientX;
+      const clampedWidth = Math.max(200, Math.min(newWidth, 550));
+      setSidebarWidth(clampedWidth);
+    };
+
+    const handleMouseUp = () => {
+      setIsResizing(false);
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+  }, []);
+
   const getBadgeStyle = (method) => {
     switch (method) {
       case 'GET': return 'bg-emerald-100 text-emerald-800 border-emerald-300';
@@ -8,8 +33,26 @@ export default function Sidebar({ data, selectedId, onSelect, isDarkMode }) {
   };
 
   return (
-    <aside className={`w-80 border-r flex flex-col overflow-y-auto shrink-0 transition-colors ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
-      <div className="p-5 space-y-7">
+    <aside 
+      style={{ width: `${sidebarWidth}px` }}
+      className={`relative border-r flex flex-col overflow-y-auto shrink-0 transition-colors ${
+        isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+      } ${isResizing ? 'select-none transition-none' : 'transition-all duration-75'}`}
+    >
+      {/* Handle Tarik Kanan / Kiri untuk Resize Width Sidebar */}
+      <div
+        onMouseDown={startResizing}
+        title="Geser ke kiri / kanan untuk memperbesar / memperkecil sidebar"
+        className={`group absolute top-0 right-0 bottom-0 w-2.5 hover:w-3 cursor-col-resize z-30 flex items-center justify-center transition-all ${
+          isResizing ? 'bg-emerald-500/30' : 'hover:bg-emerald-500/20'
+        }`}
+      >
+        <div className={`w-1 h-10 rounded-full transition-colors ${
+          isResizing ? 'bg-emerald-400' : 'bg-slate-300 dark:bg-slate-700 group-hover:bg-emerald-400'
+        }`} />
+      </div>
+
+      <div className="p-5 space-y-7 pr-4">
         {data.map((cat, idx) => (
           <div key={idx} className="space-y-2.5">
             <h2 className={`text-xs font-bold uppercase tracking-wider px-2 ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>

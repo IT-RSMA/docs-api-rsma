@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { API_DATA } from './data/apiData';
-import { logoutUserApi, getSavedToken, getSavedClientName, getAuthUser } from './lib/apiClient';
+import { logoutUserApi, getSavedToken, getSavedClientName, getAuthUser, fetchSimrsApi } from './lib/apiClient';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import MainContent from './components/MainContent';
@@ -16,8 +16,22 @@ export default function Home() {
   const [user, setUser] = useState(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
 
-  // Cek token tersimpan saat halaman dibuka ulang
+  // State untuk Try It Out API Testing
+  const [tanggalAwal, setTanggalAwal] = useState('');
+  const [tanggalAkhir, setTanggalAkhir] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [apiResult, setApiResult] = useState(null);
+
+  // Cek token tersimpan & set tanggal default saat komponen di-mount di client
   useEffect(() => {
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, '0');
+    const d = String(now.getDate()).padStart(2, '0');
+    const todayStr = `${y}-${m}-${d}`;
+    setTanggalAwal(todayStr);
+    setTanggalAkhir(todayStr);
+
     const token = getSavedToken();
     const authUser = getAuthUser();
     const name = authUser?.name || getSavedClientName();
@@ -37,7 +51,46 @@ export default function Home() {
   // Reset live response saat ganti endpoint
   const handleSelectEndpoint = (id) => {
     setSelectedEndpointId(id);
-    setLiveResponse(null);
+    setApiResult(null);
+  };
+
+  const handleSendRequest = async () => {
+    if (!user) {
+      setIsLoginModalOpen(true);
+      return;
+    }
+
+    setLoading(true);
+    setApiResult(null);
+
+    try {
+      let relativePath = activeEndpoint.path;
+      const params = new URLSearchParams();
+      if (tanggalAwal) params.append('tanggal_awal', tanggalAwal);
+      if (tanggalAkhir) params.append('tanggal_akhir', tanggalAkhir);
+      if (params.toString()) {
+        relativePath += `?${params.toString()}`;
+      }
+
+      const res = await fetchSimrsApi({
+        endpoint: relativePath,
+        method: activeEndpoint.method,
+      });
+
+      setApiResult({
+        status: res.status,
+        duration: res.duration,
+        payload: res.data,
+      });
+    } catch (err) {
+      setApiResult({
+        status: 'ERROR',
+        error: 'Koneksi gagal',
+        payload: { message: err.message },
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const filteredData = useMemo(() => {
@@ -79,11 +132,21 @@ export default function Home() {
         <MainContent
           endpoint={activeEndpoint}
           isDarkMode={isDarkMode}
+          user={user}
+          onOpenLogin={() => setIsLoginModalOpen(true)}
+          tanggalAwal={tanggalAwal}
+          setTanggalAwal={setTanggalAwal}
+          tanggalAkhir={tanggalAkhir}
+          setTanggalAkhir={setTanggalAkhir}
+          loading={loading}
+          handleSendRequest={handleSendRequest}
         />
         <CodePanel
           endpoint={activeEndpoint}
           user={user}
-          onOpenLogin={() => setIsLoginModalOpen(true)}
+          tanggalAwal={tanggalAwal}
+          tanggalAkhir={tanggalAkhir}
+          apiResult={apiResult}
         />
       </div>
 

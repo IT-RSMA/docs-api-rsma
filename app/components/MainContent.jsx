@@ -1,7 +1,35 @@
 import { useState } from 'react';
 import { BASE_URL } from '../lib/apiClient';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
-export default function MainContent({ endpoint, isDarkMode }) {
+const parseLocalDate = (dateStr) => {
+  if (!dateStr) return null;
+  const parts = dateStr.split('-');
+  if (parts.length !== 3) return new Date(dateStr);
+  return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+};
+
+const formatLocalDate = (date) => {
+  if (!date) return '';
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+};
+
+export default function MainContent({
+  endpoint,
+  isDarkMode,
+  user,
+  onOpenLogin,
+  tanggalAwal,
+  setTanggalAwal,
+  tanggalAkhir,
+  setTanggalAkhir,
+  loading,
+  handleSendRequest
+}) {
   const [copiedUrl, setCopiedUrl] = useState(false);
 
   // Merekap URL Endpoint
@@ -53,7 +81,7 @@ export default function MainContent({ endpoint, isDarkMode }) {
           </div>
           <button
             onClick={handleCopyUrl}
-            className="text-xs font-semibold px-3.5 py-1.5 rounded-xl border bg-emerald-600 hover:bg-emerald-700 text-white transition shadow-sm shrink-0"
+            className="text-xs font-semibold px-3.5 py-1.5 rounded-xl border bg-emerald-600 hover:bg-emerald-700 text-white transition shadow-sm shrink-0 cursor-pointer"
           >
             {copiedUrl ? '✓ URL Disalin' : '📋 Copas URL'}
           </button>
@@ -65,7 +93,8 @@ export default function MainContent({ endpoint, isDarkMode }) {
         </div>
       </div>
 
-      {/* Table Parameters */}
+      {/* Table Parameters (DI-COMMENT) */}
+      {/* 
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-xs font-bold text-emerald-500 uppercase tracking-wider">Query Parameters</h3>
@@ -101,6 +130,108 @@ export default function MainContent({ endpoint, isDarkMode }) {
           </table>
         </div>
       </div>
+      */}
+
+      {/* Try It Out (Testing API) Panel */}
+      <div className={`rounded-2xl border p-6 space-y-4 transition ${
+        isDarkMode ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-200 shadow-sm'
+      }`}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+            <h3 className="text-xs font-bold text-emerald-500 uppercase tracking-wider">
+              Try It Out (Testing API)
+            </h3>
+          </div>
+          {user ? (
+            <span className="text-xs text-emerald-500 font-semibold flex items-center gap-1">
+              ✓ Akun: {user.name}
+            </span>
+          ) : (
+            <span className="text-xs text-amber-500 font-semibold flex items-center gap-1">
+              🔒 Perlu Login
+            </span>
+          )}
+        </div>
+
+        <p className={`text-xs ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+          Klik tombol di bawah ini untuk menguji endpoint secara live dan hasilnya akan langsung muncul pada panel kanan.
+        </p>
+
+        {/* Inputs Parameter Tanggal (DI-COMMENT) */}
+        {/*
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+          <div>
+            <label className={`block text-xs font-medium mb-1.5 ${isDarkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+              Tanggal Awal
+            </label>
+            <DatePicker
+              selected={parseLocalDate(tanggalAwal)}
+              onChange={(date) => setTanggalAwal(formatLocalDate(date))}
+              dateFormat="dd/MM/yyyy"
+              placeholderText="Pilih tanggal awal"
+              className={`w-full text-xs rounded-xl px-3.5 py-2.5 border transition focus:outline-none focus:ring-2 focus:ring-emerald-500/50 ${
+                isDarkMode 
+                  ? 'bg-slate-950 border-slate-800 text-slate-200 placeholder-slate-600' 
+                  : 'bg-slate-50 border-slate-200 text-slate-800 placeholder-slate-400'
+              }`}
+            />
+          </div>
+
+          <div>
+            <label className={`block text-xs font-medium mb-1.5 ${isDarkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+              Tanggal Akhir
+            </label>
+            <DatePicker
+              selected={parseLocalDate(tanggalAkhir)}
+              onChange={(date) => setTanggalAkhir(formatLocalDate(date))}
+              dateFormat="dd/MM/yyyy"
+              placeholderText="Pilih tanggal akhir"
+              className={`w-full text-xs rounded-xl px-3.5 py-2.5 border transition focus:outline-none focus:ring-2 focus:ring-emerald-500/50 ${
+                isDarkMode 
+                  ? 'bg-slate-950 border-slate-800 text-slate-200 placeholder-slate-600' 
+                  : 'bg-slate-50 border-slate-200 text-slate-800 placeholder-slate-400'
+              }`}
+            />
+          </div>
+        </div>
+        */}
+
+        {/* Tombol Send / Login Trigger */}
+        <div className="pt-2">
+          {user ? (
+            <button
+              onClick={handleSendRequest}
+              disabled={loading}
+              className="w-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-semibold text-xs py-3 rounded-xl transition disabled:opacity-50 shadow-sm flex items-center justify-center gap-2 cursor-pointer"
+            >
+              {loading ? (
+                <>
+                  <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <span>Memproses ke Server RS...</span>
+                </>
+              ) : (
+                <>
+                  <span>▶</span>
+                  <span>Kirim Request ke Endpoint</span>
+                </>
+              )}
+            </button>
+          ) : (
+            <button
+              onClick={onOpenLogin}
+              className={`w-full border font-semibold text-xs py-3 rounded-xl transition flex items-center justify-center gap-2 cursor-pointer ${
+                isDarkMode 
+                  ? 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-emerald-400' 
+                  : 'bg-slate-100 hover:bg-slate-200 border-slate-200 text-emerald-700'
+              }`}
+            >
+              <span>🔑</span>
+              <span>Login Instansi untuk Menguji API</span>
+            </button>
+          )}
+        </div>
+      </div>
 
       {/* Keamanan & Otorisasi Notice */}
       <div className={`border rounded-2xl p-5 space-y-2 ${isDarkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-200'}`}>
@@ -108,7 +239,7 @@ export default function MainContent({ endpoint, isDarkMode }) {
           <span>🔒 Standar Otorisasi</span>
         </h4>
         <p className="text-xs leading-relaxed text-slate-500 dark:text-slate-400">
-          Endpoint ini memerlukan header <code className="bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded font-mono text-emerald-500">Authorization: Bearer &lt;token&gt;</code>. Untuk menguji request secara live dengan database SIMRS, silakan gunakan panel <strong>Try It Out</strong> di sebelah kanan setelah masuk dengan akun instansi.
+          Endpoint ini memerlukan header <code className="bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded font-mono text-emerald-500">Authorization: Bearer &lt;token&gt;</code>. Untuk menguji request secara live dengan database SIMRS, silakan gunakan panel <strong>Try It Out</strong> di atas setelah masuk dengan akun instansi.
         </p>
       </div>
 
