@@ -43,7 +43,7 @@ export default function CodePanel({ endpoint, user, tanggalAwal, tanggalAkhir, a
     const params = new URLSearchParams();
     if (tanggalAwal) params.append('tanggal_awal', tanggalAwal);
     if (tanggalAkhir) params.append('tanggal_akhir', tanggalAkhir);
-    
+
     if (params.toString()) {
       url += `?${params.toString()}`;
     }
@@ -74,23 +74,20 @@ export default function CodePanel({ endpoint, user, tanggalAwal, tanggalAkhir, a
   const displayPayload = apiResult ? apiResult.payload : Object.values(endpoint.responses)[0];
 
   return (
-    <aside 
+    <aside
       style={{ width: `${panelWidth}px` }}
-      className={`relative bg-slate-900 text-slate-100 flex flex-col shrink-0 border-l border-slate-800 overflow-y-auto ${
-        isResizing ? 'select-none transition-none' : 'transition-all duration-75'
-      }`}
+      className={`relative bg-slate-900 text-slate-100 flex flex-col shrink-0 border-l border-slate-800 overflow-y-auto ${isResizing ? 'select-none transition-none' : 'transition-all duration-75'
+        }`}
     >
       {/* Handle Tarik Kiri / Kanan untuk Resize Width Panel */}
       <div
         onMouseDown={startResizing}
         title="Geser ke kiri / kanan untuk memperbesar / memperkecil panel"
-        className={`group absolute top-0 left-0 bottom-0 w-2.5 hover:w-3 cursor-col-resize z-30 flex items-center justify-center transition-all ${
-          isResizing ? 'bg-emerald-500/30' : 'hover:bg-emerald-500/20'
-        }`}
+        className={`group absolute top-0 left-0 bottom-0 w-2.5 hover:w-3 cursor-col-resize z-30 flex items-center justify-center transition-all ${isResizing ? 'bg-emerald-500/30' : 'hover:bg-emerald-500/20'
+          }`}
       >
-        <div className={`w-1 h-10 rounded-full transition-colors ${
-          isResizing ? 'bg-emerald-400' : 'bg-slate-700 group-hover:bg-emerald-400'
-        }`} />
+        <div className={`w-1 h-10 rounded-full transition-colors ${isResizing ? 'bg-emerald-400' : 'bg-slate-700 group-hover:bg-emerald-400'
+          }`} />
       </div>
 
       {/* 1. Header Tab Bahasa */}
@@ -129,18 +126,17 @@ export default function CodePanel({ endpoint, user, tanggalAwal, tanggalAkhir, a
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-              {apiResult ? 'Live Server Response' : 'Expected Response Schema'}
+              {apiResult ? 'Live Server Response' : ' Response'}
             </span>
             {apiResult && (
               <>
                 <span className="text-[10px] font-mono bg-slate-800 px-2 py-0.5 rounded border border-slate-700 text-sky-400">
                   ⚡ {apiResult.duration} ms
                 </span>
-                <span className={`text-[10px] font-mono px-2 py-0.5 rounded border ${
-                  apiResult.status >= 200 && apiResult.status < 300
+                <span className={`text-[10px] font-mono px-2 py-0.5 rounded border ${apiResult.status >= 200 && apiResult.status < 300
                     ? 'bg-emerald-950 text-emerald-400 border-emerald-800'
                     : 'bg-rose-950 text-rose-400 border-rose-800'
-                }`}>
+                  }`}>
                   Status: {apiResult.status}
                 </span>
               </>

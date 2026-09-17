@@ -7,17 +7,19 @@ export default function Header({ searchQuery, setSearchQuery, user, onOpenLogin,
   return (
     <header className={`h-20 border-b flex items-center justify-between px-8 z-20 shrink-0 shadow-sm transition-colors ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
       <div className="flex items-center space-x-4">
-        <div className="bg-emerald-600 text-white p-2.5 rounded-xl font-black text-xl flex items-center justify-center w-12 h-12 shadow-md shadow-emerald-600/20">
-          RS
-        </div>
+        <img
+          src="/logo-rsma.png"
+          alt="Logo RSMA"
+          className="w-11 h-11 object-contain drop-shadow-sm"
+        />
         <div>
           <div className="flex items-center space-x-2.5">
             <span className={`font-bold text-lg leading-none ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
               API RS H.L Manambai AbdulKadir
             </span>
-            <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${isDarkMode ? 'bg-emerald-950 text-emerald-300 border-emerald-800' : 'bg-emerald-100 text-emerald-800 border-emerald-200'}`}>
+            {/* <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${isDarkMode ? 'bg-emerald-950 text-emerald-300 border-emerald-800' : 'bg-emerald-100 text-emerald-800 border-emerald-200'}`}>
               v1.0.0
-            </span>
+            </span> */}
           </div>
           <p className={`text-sm mt-1 font-mono ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>{BASE_URL}</p>
         </div>
@@ -37,12 +39,12 @@ export default function Header({ searchQuery, setSearchQuery, user, onOpenLogin,
         {/* Tombol Dark/Light Mode (Uiverse Switch) */}
         <label htmlFor="theme" className="theme" title={isDarkMode ? 'Mode Gelap' : 'Mode Terang'}>
           <span className="theme__toggle-wrap">
-            <input 
-              id="theme" 
-              className="theme__toggle" 
-              type="checkbox" 
-              role="switch" 
-              name="theme" 
+            <input
+              id="theme"
+              className="theme__toggle"
+              type="checkbox"
+              role="switch"
+              name="theme"
               value="dark"
               checked={isDarkMode}
               onChange={onToggleDarkMode}
@@ -78,7 +80,7 @@ export default function Header({ searchQuery, setSearchQuery, user, onOpenLogin,
           <button onClick={onOpenLogin} className="Btn">
             <span>Login</span>
             <svg className="svgIcon" viewBox="0 0 512 512">
-              <path d="M336 0c-88.4 0-160 71.6-160 160c0 20.2 3.7 39.6 10.6 57.5L9.4 394.5c-6 6-9.4 14.1-9.4 22.6V480c0 17.7 14.3 32 32 32h64c17.7 0 32-14.3 32-32V448h32c17.7 0 32-14.3 32-32V384h32c8.5 0 16.6-3.4 22.6-9.4l43-43c17.9 6.8 37.3 10.5 57.5 10.5c88.4 0 160-71.6 160-160S424.4 0 336 0zM384 144c-17.7 0-32-14.3-32-32s14.3-32 32-32s32 14.3 32 32s-14.3 32-32 32z"/>
+              <path d="M336 0c-88.4 0-160 71.6-160 160c0 20.2 3.7 39.6 10.6 57.5L9.4 394.5c-6 6-9.4 14.1-9.4 22.6V480c0 17.7 14.3 32 32 32h64c17.7 0 32-14.3 32-32V448h32c17.7 0 32-14.3 32-32V384h32c8.5 0 16.6-3.4 22.6-9.4l43-43c17.9 6.8 37.3 10.5 57.5 10.5c88.4 0 160-71.6 160-160S424.4 0 336 0zM384 144c-17.7 0-32-14.3-32-32s14.3-32 32-32s32 14.3 32 32s-14.3 32-32 32z" />
             </svg>
           </button>
         )}

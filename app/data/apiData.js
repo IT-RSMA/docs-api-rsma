@@ -101,7 +101,9 @@ export const API_DATA = [
             }
           }
         }
-      },
+      }
+      /*
+      ,
       {
         id: 'ralan-tanggal',
         title: 'Kunjungan Ralan Per Tanggal',
@@ -129,6 +131,7 @@ export const API_DATA = [
           }
         }
       }
+      */
     ]
   },
   {

@@ -53,7 +53,7 @@ export default function MainContent({
 
   return (
     <main className={`flex-1 overflow-y-auto p-10 space-y-8 transition-colors ${isDarkMode ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-800'}`}>
-      
+
       {/* Informational Callout (Periode Default) */}
       <div className={`border rounded-2xl p-4 text-xs space-y-1.5 ${isDarkMode ? 'bg-emerald-950/20 border-emerald-900/50 text-emerald-200' : 'bg-emerald-50 border-emerald-200 text-slate-700'}`}>
         <div className="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
@@ -68,14 +68,12 @@ export default function MainContent({
       <div className={`border-b pb-7 space-y-4 ${isDarkMode ? 'border-slate-800' : 'border-slate-200'}`}>
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center space-x-2.5 flex-1 min-w-0">
-            <span className={`text-xs font-bold px-3 py-1 rounded-lg border uppercase shrink-0 ${
-              endpoint.method === 'GET' ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-blue-100 text-blue-800 border-blue-300'
-            }`}>
+            <span className={`text-xs font-bold px-3 py-1 rounded-lg border uppercase shrink-0 ${endpoint.method === 'GET' ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-blue-100 text-blue-800 border-blue-300'
+              }`}>
               {endpoint.method}
             </span>
-            <div className={`font-mono text-xs font-semibold px-3 py-1.5 rounded-xl border truncate flex-1 ${
-              isDarkMode ? 'bg-slate-900 border-slate-800 text-emerald-400' : 'bg-white border-slate-200 text-emerald-700'
-            }`}>
+            <div className={`font-mono text-xs font-semibold px-3 py-1.5 rounded-xl border truncate flex-1 ${isDarkMode ? 'bg-slate-900 border-slate-800 text-emerald-400' : 'bg-white border-slate-200 text-emerald-700'
+              }`}>
               {getFullUrl()}
             </div>
           </div>
@@ -133,14 +131,13 @@ export default function MainContent({
       */}
 
       {/* Try It Out (Testing API) Panel */}
-      <div className={`rounded-2xl border p-6 space-y-4 transition ${
-        isDarkMode ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-200 shadow-sm'
-      }`}>
+      <div className={`rounded-2xl border p-6 space-y-4 transition ${isDarkMode ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-200 shadow-sm'
+        }`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
             <h3 className="text-xs font-bold text-emerald-500 uppercase tracking-wider">
-              Try It Out (Testing API)
+              Testing API
             </h3>
           </div>
           {user ? (
@@ -221,7 +218,7 @@ export default function MainContent({
             <button onClick={onOpenLogin} className="Btn Btn-full">
               <span>Login</span>
               <svg className="svgIcon" viewBox="0 0 512 512">
-                <path d="M336 0c-88.4 0-160 71.6-160 160c0 20.2 3.7 39.6 10.6 57.5L9.4 394.5c-6 6-9.4 14.1-9.4 22.6V480c0 17.7 14.3 32 32 32h64c17.7 0 32-14.3 32-32V448h32c17.7 0 32-14.3 32-32V384h32c8.5 0 16.6-3.4 22.6-9.4l43-43c17.9 6.8 37.3 10.5 57.5 10.5c88.4 0 160-71.6 160-160S424.4 0 336 0zM384 144c-17.7 0-32-14.3-32-32s14.3-32 32-32s32 14.3 32 32s-14.3 32-32 32z"/>
+                <path d="M336 0c-88.4 0-160 71.6-160 160c0 20.2 3.7 39.6 10.6 57.5L9.4 394.5c-6 6-9.4 14.1-9.4 22.6V480c0 17.7 14.3 32 32 32h64c17.7 0 32-14.3 32-32V448h32c17.7 0 32-14.3 32-32V384h32c8.5 0 16.6-3.4 22.6-9.4l43-43c17.9 6.8 37.3 10.5 57.5 10.5c88.4 0 160-71.6 160-160S424.4 0 336 0zM384 144c-17.7 0-32-14.3-32-32s14.3-32 32-32s32 14.3 32 32s-14.3 32-32 32z" />
               </svg>
             </button>
           )}
