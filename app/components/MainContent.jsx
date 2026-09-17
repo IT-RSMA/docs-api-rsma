@@ -218,16 +218,11 @@ export default function MainContent({
               )}
             </button>
           ) : (
-            <button
-              onClick={onOpenLogin}
-              className={`w-full border font-semibold text-xs py-3 rounded-xl transition flex items-center justify-center gap-2 cursor-pointer ${
-                isDarkMode 
-                  ? 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-emerald-400' 
-                  : 'bg-slate-100 hover:bg-slate-200 border-slate-200 text-emerald-700'
-              }`}
-            >
-              <span>🔑</span>
-              <span>Login Instansi untuk Menguji API</span>
+            <button onClick={onOpenLogin} className="Btn Btn-full">
+              <span>Login</span>
+              <svg className="svgIcon" viewBox="0 0 512 512">
+                <path d="M336 0c-88.4 0-160 71.6-160 160c0 20.2 3.7 39.6 10.6 57.5L9.4 394.5c-6 6-9.4 14.1-9.4 22.6V480c0 17.7 14.3 32 32 32h64c17.7 0 32-14.3 32-32V448h32c17.7 0 32-14.3 32-32V384h32c8.5 0 16.6-3.4 22.6-9.4l43-43c17.9 6.8 37.3 10.5 57.5 10.5c88.4 0 160-71.6 160-160S424.4 0 336 0zM384 144c-17.7 0-32-14.3-32-32s14.3-32 32-32s32 14.3 32 32s-14.3 32-32 32z"/>
+              </svg>
             </button>
           )}
         </div>

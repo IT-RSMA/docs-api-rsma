@@ -110,9 +110,12 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, isDarkMode
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm py-2.5 rounded-xl transition shadow-sm mt-2 disabled:opacity-50"
+            className="Btn Btn-full mt-2 disabled:opacity-50"
           >
-            {loading ? 'Memverifikasi...' : 'Masuk'}
+            <span>{loading ? 'Memverifikasi...' : 'Login'}</span>
+            <svg className="svgIcon" viewBox="0 0 512 512">
+              <path d="M336 0c-88.4 0-160 71.6-160 160c0 20.2 3.7 39.6 10.6 57.5L9.4 394.5c-6 6-9.4 14.1-9.4 22.6V480c0 17.7 14.3 32 32 32h64c17.7 0 32-14.3 32-32V448h32c17.7 0 32-14.3 32-32V384h32c8.5 0 16.6-3.4 22.6-9.4l43-43c17.9 6.8 37.3 10.5 57.5 10.5c88.4 0 160-71.6 160-160S424.4 0 336 0zM384 144c-17.7 0-32-14.3-32-32s14.3-32 32-32s32 14.3 32 32s-14.3 32-32 32z"/>
+            </svg>
           </button>
         </form>
       </div>

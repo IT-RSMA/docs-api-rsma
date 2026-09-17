@@ -34,14 +34,32 @@ export default function Header({ searchQuery, setSearchQuery, user, onOpenLogin,
       </div>
 
       <div className="flex items-center space-x-3">
-        {/* Tombol Dark/Light Mode */}
-        <button
-          onClick={onToggleDarkMode}
-          className={`p-2.5 rounded-xl border text-sm font-semibold transition flex items-center gap-2 ${isDarkMode ? 'bg-slate-800 border-slate-700 text-amber-400 hover:bg-slate-700' : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200'}`}
-          title="Ubah Tema"
-        >
-          {isDarkMode ? '🌙 Dark' : '☀️ Light'}
-        </button>
+        {/* Tombol Dark/Light Mode (Uiverse Switch) */}
+        <label htmlFor="theme" className="theme" title={isDarkMode ? 'Mode Gelap' : 'Mode Terang'}>
+          <span className="theme__toggle-wrap">
+            <input 
+              id="theme" 
+              className="theme__toggle" 
+              type="checkbox" 
+              role="switch" 
+              name="theme" 
+              value="dark"
+              checked={isDarkMode}
+              onChange={onToggleDarkMode}
+            />
+            <span className="theme__icon">
+              <span className="theme__icon-part"></span>
+              <span className="theme__icon-part"></span>
+              <span className="theme__icon-part"></span>
+              <span className="theme__icon-part"></span>
+              <span className="theme__icon-part"></span>
+              <span className="theme__icon-part"></span>
+              <span className="theme__icon-part"></span>
+              <span className="theme__icon-part"></span>
+              <span className="theme__icon-part"></span>
+            </span>
+          </span>
+        </label>
 
         {user ? (
           <div className="flex items-center space-x-2.5">
@@ -57,12 +75,11 @@ export default function Header({ searchQuery, setSearchQuery, user, onOpenLogin,
             </button>
           </div>
         ) : (
-          <button
-            onClick={onOpenLogin}
-            className="text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl font-semibold transition shadow-sm flex items-center gap-1.5"
-          >
-            <span>🔑</span>
-            <span>Login Instansi</span>
+          <button onClick={onOpenLogin} className="Btn">
+            <span>Login</span>
+            <svg className="svgIcon" viewBox="0 0 512 512">
+              <path d="M336 0c-88.4 0-160 71.6-160 160c0 20.2 3.7 39.6 10.6 57.5L9.4 394.5c-6 6-9.4 14.1-9.4 22.6V480c0 17.7 14.3 32 32 32h64c17.7 0 32-14.3 32-32V448h32c17.7 0 32-14.3 32-32V384h32c8.5 0 16.6-3.4 22.6-9.4l43-43c17.9 6.8 37.3 10.5 57.5 10.5c88.4 0 160-71.6 160-160S424.4 0 336 0zM384 144c-17.7 0-32-14.3-32-32s14.3-32 32-32s32 14.3 32 32s-14.3 32-32 32z"/>
+            </svg>
           </button>
         )}
       </div>
