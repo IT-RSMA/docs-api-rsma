@@ -155,8 +155,7 @@ export default function MainContent({
           Klik tombol di bawah ini untuk menguji endpoint secara live dan hasilnya akan langsung muncul pada panel kanan.
         </p>
 
-        {/* Inputs Parameter Tanggal (DI-COMMENT) */}
-        {/*
+        {/* Inputs Parameter Tanggal */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
           <div>
             <label className={`block text-xs font-medium mb-1.5 ${isDarkMode ? 'text-slate-300' : 'text-slate-600'}`}>
@@ -192,7 +191,6 @@ export default function MainContent({
             />
           </div>
         </div>
-        */}
 
         {/* Tombol Send / Login Trigger */}
         <div className="pt-2">

@@ -22,6 +22,8 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [apiResult, setApiResult] = useState(null);
 
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
   // Cek token tersimpan & set tanggal default saat komponen di-mount di client
   useEffect(() => {
     const now = new Date();
@@ -52,6 +54,7 @@ export default function Home() {
   const handleSelectEndpoint = (id) => {
     setSelectedEndpointId(id);
     setApiResult(null);
+    setIsMobileSidebarOpen(false); // Otomatis tutup sidebar drawer di mobile setelah memilih
   };
 
   const handleSendRequest = async () => {
@@ -120,14 +123,18 @@ export default function Home() {
         onLogout={handleLogout}
         isDarkMode={isDarkMode}
         onToggleDarkMode={() => setIsDarkMode(!isDarkMode)}
+        isMobileSidebarOpen={isMobileSidebarOpen}
+        onToggleMobileSidebar={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
       />
       
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden relative flex-col lg:flex-row">
         <Sidebar
           data={filteredData}
           selectedId={selectedEndpointId}
           onSelect={handleSelectEndpoint}
           isDarkMode={isDarkMode}
+          isOpenMobile={isMobileSidebarOpen}
+          onCloseMobile={() => setIsMobileSidebarOpen(false)}
         />
         <MainContent
           endpoint={activeEndpoint}
